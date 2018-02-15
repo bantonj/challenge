@@ -129,7 +129,7 @@ func TestCheckNPIs(t *testing.T) {
 			require.NoError(t, err)
 
 			require.Contains(t, m, test.input)
-			assert.Equal(t, m[test.input], test.output)
+			assert.Equal(t, test.output, m[test.input])
 		})
 	}
 
