@@ -63,8 +63,7 @@ func TestCheckNPIs(t *testing.T) {
 		t.Run(strconv.Itoa(test.input), func(t *testing.T) {
 			t.Parallel()
 
-			m, err := CheckNPIs([]int{test.input})
-			require.NoError(t, err)
+			m := CheckNPIs([]int{test.input})
 
 			require.Contains(t, m, test.input)
 			assert.Equal(t, m[test.input], test.output)
