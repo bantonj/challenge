@@ -10,6 +10,7 @@ import (
 
 type ssvParser struct{}
 
+// TODO(Erik): bad input breaks this easily
 func (p *ssvParser) Parse(r io.Reader) ([]Record, error) {
 	var rs []Record
 

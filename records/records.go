@@ -20,6 +20,22 @@ type Record struct {
 	DateOfBirth   time.Time
 }
 
+func (r Record) String() string {
+	return strings.Join(
+		[]string{
+			r.FirstName,
+			r.MiddleInitial,
+			r.LastName,
+			r.Gender,
+			r.ProviderType,
+			r.DateOfBirth.Format("01/02/2006"),
+		},
+		" ",
+	)
+}
+
+// TODO(Erik): instead of hand-writing individual parsers, what about a config
+// style thing?
 type parser interface {
 	Parse(io.Reader) ([]Record, error)
 }

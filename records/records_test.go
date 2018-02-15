@@ -58,6 +58,20 @@ func TestParseRecords(t *testing.T) {
 				},
 			},
 		},
+		{
+			"SSV missing MiddleInitial",
+			"LastName FirstName  F 1-13-1970 ProviderType",
+			[]Record{
+				{
+					FirstName:     "FirstName",
+					MiddleInitial: "",
+					LastName:      "LastName",
+					Gender:        "Female",
+					ProviderType:  "ProviderType",
+					DateOfBirth:   time.Date(1970, 1, 13, 0, 0, 0, 0, time.UTC),
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {
