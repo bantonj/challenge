@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCheckNPIs(t *testing.T) {
+func Test_checkLuhn(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -63,10 +63,85 @@ func TestCheckNPIs(t *testing.T) {
 		t.Run(strconv.Itoa(test.input), func(t *testing.T) {
 			t.Parallel()
 
-			m := CheckNPIs([]int{test.input})
+			valid := checkLuhn(getDigits(test.input))
+			assert.Equal(t, valid, test.output)
+		})
+	}
+}
+
+func Test_getLuhnCheckDigit(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		input  int
+		output int
+	}{
+		{
+			7992739871,
+			3,
+		},
+		{
+			123456789,
+			7,
+		},
+		{
+			80840123456789,
+			3,
+		},
+	}
+
+	for _, test := range tests {
+		test := test
+
+		t.Run(strconv.Itoa(test.input), func(t *testing.T) {
+			t.Parallel()
+
+			d := getLuhnCheckDigit(getDigits(test.input))
+			assert.Equal(t, d, test.output)
+		})
+	}
+}
+
+func TestCheckNPIs(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		input  int
+		output bool
+	}{
+		{
+			123456789,
+			true,
+		},
+		{
+			1234567893,
+			true,
+		},
+	}
+
+	for _, test := range tests {
+		test := test
+
+		t.Run(strconv.Itoa(test.input), func(t *testing.T) {
+			t.Parallel()
+
+			m, err := CheckNPIs([]int{test.input})
+			require.NoError(t, err)
 
 			require.Contains(t, m, test.input)
 			assert.Equal(t, m[test.input], test.output)
 		})
 	}
+
+	t.Run("long", func(t *testing.T) {
+		npi := 12345678901
+		_, err := CheckNPIs([]int{npi})
+		require.Error(t, err)
+	})
+
+	t.Run("short", func(t *testing.T) {
+		npi := 12345678
+		_, err := CheckNPIs([]int{npi})
+		require.Error(t, err)
+	})
 }

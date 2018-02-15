@@ -44,7 +44,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	results := npi.CheckNPIs(npis)
+	results, err := npi.CheckNPIs(npis)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error while checking NPIs: %s", err)
+		os.Exit(1)
+	}
+
 	for npi, valid := range results {
 		fmt.Printf("%d: %v\n", npi, valid)
 	}

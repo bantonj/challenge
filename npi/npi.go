@@ -11,12 +11,8 @@ func getDigits(i int) []int {
 	s := strconv.Itoa(i)
 	for d := 0; d < len(s); d++ {
 		// when you index a string, you get a byte; restring it
-		n, err := strconv.Atoi(string(s[d]))
-		if err != nil {
-			// we started with an int, so how it could not go back to an int?
-			panic(fmt.Sprintf("this shouldn't be possible: %s", err))
-		}
-
+		// error is ignored because it should be impossible to fail
+		n, _ := strconv.Atoi(string(s[d]))
 		is = append(is, n)
 	}
 
@@ -49,14 +45,55 @@ func checkLuhn(ds []int) bool {
 	return sum%10 == 0
 }
 
+func getLuhnCheckDigit(ds []int) int {
+	var sum int
+
+	double := true
+	for i := len(ds) - 1; i >= 0; i-- {
+		d := ds[i]
+		if double {
+			d *= 2
+		}
+
+		if d > 9 {
+			d -= 9
+		}
+
+		sum += d
+		double = !double
+	}
+
+	sum *= 9
+	sumDigits := getDigits(sum)
+	return sumDigits[len(sumDigits)-1]
+}
+
+const (
+	npiPrefix = 80840
+)
+
 // CheckNPIs takes a slice of int and returns a map keyed those ints declaring
 // whether or not they are valid NPIs.
-func CheckNPIs(npis []int) map[int]bool {
+func CheckNPIs(npis []int) (map[int]bool, error) {
 	results := make(map[int]bool, len(npis))
 
 	for _, npi := range npis {
-		results[npi] = checkLuhn(getDigits(npi))
+		ds := getDigits(npi)
+		l := len(ds)
+		ds = append(getDigits(npiPrefix), ds...)
+
+		switch l {
+		case 10:
+			results[npi] = checkLuhn(ds)
+
+		case 9:
+			ds = append(ds, getLuhnCheckDigit(ds))
+			results[npi] = checkLuhn(ds)
+
+		default:
+			return nil, fmt.Errorf("NPIs should contain 9 or 10 digits: %d (%d)", npi, l)
+		}
 	}
 
-	return results
+	return results, nil
 }
