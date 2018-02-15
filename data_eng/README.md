@@ -2,7 +2,7 @@
 
 This challenge has 2 parts. In the first part, we ask you to use the Luhn algorithm to evaluate the validity of an important healthcare identification number. In the second we ask you to process and organize several types of data files.
 
-#### Part 1 
+#### Part 1
 
 **Description:** Every healthcare provider (doctor, nurse, PA etc.) is assigned a National Provider Identifier (NPI), a unique ID number that identifies that provider nationally with the federal government. The NPI is generated and validated using the Luhn formula (which is also used for credit card numbers). Any time a user enters an NPI into any database across the healthcare system we are at risk of human error and mistyping. This has downstream impacts any time another user or system needs that data.
 
@@ -10,8 +10,8 @@ This challenge has 2 parts. In the first part, we ask you to use the Luhn algori
 
 **Display Requirements:** Generate a list of NPI numbers followed by a boolean value indicating whether they are valid (true) or invalid (false).
 
-Resources: 
-+ [CMS NPI Guidlines](https://www.cms.gov/Regulations-and-Guidance/HIPAA-Administrative-Simplification/NationalProvIdentStand/downloads/npicheckdigit.pdf)
+Resources:
++ [CMS NPI Guidlines](https://www.cms.gov/Regulations-and-Guidance/Administrative-Simplification/NationalProvIdentStand/Downloads/NPIcheckdigit.pdf)
 + NPI Numbers:<br>
 1356320139<br>
 1285849489<br>
