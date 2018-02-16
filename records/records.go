@@ -102,11 +102,17 @@ func parseGender(g string) string {
 	}
 }
 
-// TODO(Erik): fix birthdates later than this year
 func parseDOB(layout string, t string) (time.Time, error) {
 	dob, err := time.Parse(layout, t)
 	if err != nil {
 		return time.Time{}, fmt.Errorf("error parsing time (%s): %s", t, err)
 	}
+
+	// With two digit years, sometimes Go parses them as 20xx instead of 19xx.
+	// 70 *seems* to be the cutoff.
+	if dob.After(time.Now()) {
+		dob = dob.AddDate(-100, 0, 0)
+	}
+
 	return dob, nil
 }
