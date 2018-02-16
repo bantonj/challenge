@@ -72,12 +72,12 @@ type recordParser struct {
 func (p recordParser) Parse(r io.Reader) ([]Record, error) {
 	var rs []Record
 
-	ssvR := csv.NewReader(r)
-	ssvR.Comma = p.delim
-	ssvR.FieldsPerRecord = len(p.fieldParsers)
+	rr := csv.NewReader(r)
+	rr.Comma = p.delim
+	rr.FieldsPerRecord = len(p.fieldParsers)
 
 	for {
-		fields, err := ssvR.Read()
+		fields, err := rr.Read()
 		if err == io.EOF {
 			return rs, nil
 		}
@@ -86,7 +86,7 @@ func (p recordParser) Parse(r io.Reader) ([]Record, error) {
 		}
 
 		var r Record
-		for i := 0; i < ssvR.FieldsPerRecord; i++ {
+		for i := 0; i < rr.FieldsPerRecord; i++ {
 			p.fieldParsers[i](&r, fields[i])
 		}
 
