@@ -26,7 +26,7 @@ func (r sortableRecords) Swap(i, j int) {
 	r.rs[i], r.rs[j] = r.rs[j], r.rs[i]
 }
 
-func newProviderSort(rs []records.Record) sortableRecords {
+func newProviderSorter(rs []records.Record) sortableRecords {
 	return sortableRecords{
 		rs: rs,
 		less: func(rs []records.Record, i, j int) bool {
@@ -41,7 +41,7 @@ func newProviderSort(rs []records.Record) sortableRecords {
 	}
 }
 
-func newDOBSort(rs []records.Record) sortableRecords {
+func newDOBSorter(rs []records.Record) sortableRecords {
 	return sortableRecords{
 		rs: rs,
 		less: func(rs []records.Record, i, j int) bool {
@@ -51,7 +51,7 @@ func newDOBSort(rs []records.Record) sortableRecords {
 	}
 }
 
-func newLastNameSort(rs []records.Record) sortableRecords {
+func newLastNameSorter(rs []records.Record) sortableRecords {
 	return sortableRecords{
 		rs: rs,
 		less: func(rs []records.Record, i, j int) bool {
@@ -64,13 +64,13 @@ func newLastNameSort(rs []records.Record) sortableRecords {
 func getSorter(s string, rs []records.Record) (sort.Interface, error) {
 	switch s {
 	case "provider":
-		return newProviderSort(rs), nil
+		return newProviderSorter(rs), nil
 
 	case "dob":
-		return newDOBSort(rs), nil
+		return newDOBSorter(rs), nil
 
 	case "lastname":
-		return newLastNameSort(rs), nil
+		return newLastNameSorter(rs), nil
 
 	default:
 		return nil, fmt.Errorf("invalid sort parameter: %s", s)
