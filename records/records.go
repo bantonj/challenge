@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"strings"
 	"time"
 )
 
@@ -20,56 +19,27 @@ type Record struct {
 	DateOfBirth   time.Time
 }
 
-// TODO(Erik): instead of hand-writing individual parsers, what about a config
-// style thing?
-type parser interface {
-	Parse(io.Reader) ([]Record, error)
-}
-
-type delimiter int8
-
 const (
-	unknown delimiter = iota
-	pipe
-	comma
-	space
+	pipeRune  = '|'
+	commaRune = ','
+	spaceRune = ' '
 )
 
-func getParser(delim delimiter) (parser, error) {
-	switch delim {
-	case pipe:
-		return &psvParser{}, nil
-
-	case comma:
-		return &csvParser{}, nil
-
-	case space:
-		return &ssvParser{}, nil
-
-	default:
-		return nil, errors.New("invalid delimiter")
-	}
-}
-
-func findDelimiter(bs []byte) (delimiter, error) {
-	if bytes.Contains(bs, []byte{'|'}) {
-		return pipe, nil
+func findDelimiter(bs []byte) (rune, error) {
+	for _, r := range []rune{pipeRune, commaRune, spaceRune} {
+		if bytes.ContainsRune(bs, r) {
+			return r, nil
+		}
 	}
 
-	if bytes.Contains(bs, []byte{','}) {
-		return comma, nil
-	}
-
-	if bytes.Contains(bs, []byte{' '}) {
-		return space, nil
-	}
-
-	return unknown, errors.New("could not identify delimiter")
+	return 0x0, errors.New("could not identify delimiter")
 }
 
 // ParseRecords take an io.Reader containing records in various formats and
 // returns them in a consistent POGO.
 func ParseRecords(r io.Reader) ([]Record, error) {
+	// there may be a more memory efficient way to do this, but it's less
+	// reader-efficient
 	bs, err := ioutil.ReadAll(r)
 	if err != nil {
 		return nil, fmt.Errorf("error reading from reader: %s", err)
@@ -87,32 +57,4 @@ func ParseRecords(r io.Reader) ([]Record, error) {
 
 	buf := bytes.NewBuffer(bs)
 	return parser.Parse(buf)
-}
-
-func parseGender(g string) string {
-	switch strings.ToLower(g) {
-	case "m", "male":
-		return "Male"
-
-	case "f", "female":
-		return "Female"
-
-	default:
-		return "Unknown"
-	}
-}
-
-func parseDOB(layout string, t string) (time.Time, error) {
-	dob, err := time.Parse(layout, t)
-	if err != nil {
-		return time.Time{}, fmt.Errorf("error parsing time (%s): %s", t, err)
-	}
-
-	// With two digit years, sometimes Go parses them as 20xx instead of 19xx.
-	// 70 *seems* to be the cutoff.
-	if dob.After(time.Now()) {
-		dob = dob.AddDate(-100, 0, 0)
-	}
-
-	return dob, nil
 }
