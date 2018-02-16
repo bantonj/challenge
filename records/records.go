@@ -36,6 +36,7 @@ func (r Record) String() string {
 
 // TODO(Erik): instead of hand-writing individual parsers, what about a config
 // style thing?
+// TODO(Erik): fix birthdates later than this year
 type parser interface {
 	Parse(io.Reader) ([]Record, error)
 }
