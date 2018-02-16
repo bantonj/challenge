@@ -36,7 +36,6 @@ func (r Record) String() string {
 
 // TODO(Erik): instead of hand-writing individual parsers, what about a config
 // style thing?
-// TODO(Erik): fix birthdates later than this year
 type parser interface {
 	Parse(io.Reader) ([]Record, error)
 }
@@ -115,4 +114,13 @@ func parseGender(g string) string {
 	default:
 		return "Unknown"
 	}
+}
+
+// TODO(Erik): fix birthdates later than this year
+func parseDOB(layout string, t string) (time.Time, error) {
+	dob, err := time.Parse(layout, t)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("error parsing time (%s): %s", t, err)
+	}
+	return dob, nil
 }

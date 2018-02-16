@@ -1,44 +1,44 @@
 package records
 
 import (
-	"bufio"
+	"encoding/csv"
 	"fmt"
 	"io"
-	"strings"
-	"time"
 )
 
 type ssvParser struct{}
 
-// TODO(Erik): bad input breaks this easily
 func (p *ssvParser) Parse(r io.Reader) ([]Record, error) {
 	var rs []Record
 
-	scanner := bufio.NewScanner(r)
-	for scanner.Scan() {
-		t := scanner.Text()
+	ssvR := csv.NewReader(r)
+	ssvR.Comma = ' '
+	ssvR.FieldsPerRecord = 6
 
-		// LastName FirstName MiddleInitial Gender(M/F) DateOfBirth(M-D-YYYY) ProviderType
-		parts := strings.Split(t, " ")
-		r := Record{
-			LastName:      parts[0],
-			FirstName:     parts[1],
-			MiddleInitial: parts[2],
-			Gender:        parseGender(parts[3]),
-			ProviderType:  parts[5],
+	for {
+		fields, err := ssvR.Read()
+		if err == io.EOF {
+			return rs, nil
+		}
+		if err != nil {
+			return nil, fmt.Errorf("error reading input: %s", err)
 		}
 
-		dob, err := time.Parse("1-2-2006", parts[4])
+		// LastName FirstName MiddleInitial Gender(M/F) DateOfBirth(M-D-YYYY) ProviderType
+		r := Record{
+			LastName:      fields[0],
+			FirstName:     fields[1],
+			MiddleInitial: fields[2],
+			Gender:        parseGender(fields[3]),
+			ProviderType:  fields[5],
+		}
+
+		dob, err := parseDOB("1-2-2006", fields[4])
 		if err != nil {
-			return nil, fmt.Errorf("error parsing time (%s): %s", parts[4], err)
+			return nil, err
 		}
 		r.DateOfBirth = dob
 
 		rs = append(rs, r)
 	}
-	if err := scanner.Err(); err != nil {
-		return nil, fmt.Errorf("error parsing SSV: %s", err)
-	}
-
-	return rs, nil
 }
